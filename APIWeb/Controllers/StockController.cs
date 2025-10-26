@@ -1,4 +1,6 @@
 ﻿using APIWeb.Data;
+using APIWeb.Dtos.Stocks;
+using APIWeb.Mappers;
 using Microsoft.AspNetCore.Mvc;
 
 namespace APIWeb.Controllers
@@ -16,11 +18,12 @@ namespace APIWeb.Controllers
         [HttpGet]
         public IActionResult GetAllStocks()
         {
-            var stocks = _context.Stock.ToList();
+            var stocks = _context.Stock.ToList()
+                .Select(s => s.ToStockDto());
             return Ok(stocks);
         }
 
-        [HttpGet("Id")]
+        [HttpGet("{Id}")]
         public IActionResult GetStock([FromRoute] int Id)
         {
             var stock = _context.Stock.Find(Id);
@@ -30,10 +33,19 @@ namespace APIWeb.Controllers
                 return NotFound();
             }
 
-            return Ok(stock);
+            return Ok(stock.ToStockDto());
         }
 
+        [HttpPost]
+        public IActionResult CreateStock([FromBody] CreateStockDto stockDto)
+        {
+            var stockModel = stockDto.ToStockFromCreateDto();
+            _context.Stock.Add(stockModel);
+            _context.SaveChanges();
+
+            return CreatedAtAction(nameof(GetStock), new { Id = stockModel.Id }, stockModel.ToStockDto());
 
 
+        }
     }
 }
