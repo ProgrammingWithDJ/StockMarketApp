@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace APIWeb.Controllers
 {
-    public class CommentController : Controller
+    public class CommentController : ControllerBase
     {
         private readonly ICommentsRepository _commentsRepository;
         public CommentController(ICommentsRepository commentsRepository)
