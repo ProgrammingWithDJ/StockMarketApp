@@ -1,5 +1,6 @@
 ﻿using APIWeb.Data;
 using APIWeb.Dtos.Stocks;
+using APIWeb.Interfaces;
 using APIWeb.Mappers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -11,15 +12,17 @@ namespace APIWeb.Controllers
     public class StockController : ControllerBase
     {
         private readonly ApplicationDBContext _context;
-        public StockController(ApplicationDBContext context)
+        private readonly IStockRepository _stockRepo;
+        public StockController(ApplicationDBContext context, IStockRepository stockRepository)
         {
+            _stockRepo = stockRepository;
             _context = context;
         }
 
         [HttpGet]
         public async Task<IActionResult> GetAllStocksAsync()
         {
-            var stocks = await _context.Stock.ToListAsync();
+            var stocks = await _stockRepo.GetAllStocksAsync();
 
             var selectedSTocks = stocks.Select(s => s.ToStockDto());
             return Ok(selectedSTocks);
@@ -28,7 +31,7 @@ namespace APIWeb.Controllers
         [HttpGet("{Id}")]
         public async Task<IActionResult> GetStockAsync([FromRoute] int Id)
         {
-            var stock = await _context.Stock.FindAsync(Id);
+            var stock = await _stockRepo.GetStockByIdAsync(Id);
 
             if (stock == null)
             {
@@ -42,8 +45,7 @@ namespace APIWeb.Controllers
         public async Task<IActionResult> CreateStockAsync([FromBody] CreateStockDto stockDto)
         {
             var stockModel = stockDto.ToStockFromCreateDto();
-            _context.Stock.Add(stockModel);
-            await _context.SaveChangesAsync();
+          await  _stockRepo.CreateStockAsync(stockModel);
 
             return CreatedAtAction(nameof(GetStockAsync), new { Id = stockModel.Id }, stockModel.ToStockDto());
 
@@ -54,7 +56,7 @@ namespace APIWeb.Controllers
         [Route("{Id}")]
         public async Task<IActionResult> UpdateStockAsync([FromRoute] int Id, [FromBody] UpdateStockDto stockDto)
         {
-            var stockModel = await _context.Stock.FindAsync(Id);
+            var stockModel = await _stockRepo.GetStockByIdAsync(Id);
             if (stockModel == null)
             {
                 return NotFound();
@@ -65,8 +67,8 @@ namespace APIWeb.Controllers
             stockModel.LastDiv = stockDto.LastDiv;
             stockModel.Industry = stockDto.Industry;
             stockModel.MarketCap = stockDto.MarketCap;
-            _context.Stock.Update(stockModel);
-            await _context.SaveChangesAsync();
+
+           await  _stockRepo.UpdateStockAsync(Id, stockDto);
             return NoContent();
         }
 
@@ -74,13 +76,14 @@ namespace APIWeb.Controllers
         [Route("{Id}")]
         public async Task<IActionResult> DeleteStock([FromRoute] int Id)
         {
-            var stockModel = await _context.Stock.FindAsync(Id);
+            var stockModel = await _stockRepo.GetStockByIdAsync(Id);
             if (stockModel == null)
             {
                 return NotFound();
             }
-            _context.Stock.Remove(stockModel);
-            await _context.SaveChangesAsync();
+            
+            await _stockRepo.DeleteStockAsync(Id);
+
             return NoContent();
         }
     }
