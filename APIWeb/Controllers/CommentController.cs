@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace APIWeb.Controllers
 {
+    [Route("api/comment")]
+    [ApiController]
     public class CommentController : ControllerBase
     {
         private readonly ICommentsRepository _commentsRepository;
@@ -22,15 +24,11 @@ namespace APIWeb.Controllers
             return Ok(selectedSTocks);
         }
 
-        [HttpGet]
-        [Route("{id}")]
+        [HttpGet("{id}", Name = "GetCommentById")]
         public async Task<IActionResult> GetCommentByIdAsync([FromRoute] int id)
         {
             var comment = await _commentsRepository.GetCommentByIdAsync(id);
-            if (comment == null)
-            {
-                return NotFound();
-            }
+            if (comment == null) return NotFound();
             return Ok(comment);
         }
 
@@ -41,10 +39,12 @@ namespace APIWeb.Controllers
             {
                 Title = createCommentDto.Title,
                 Content = createCommentDto.Content,
-                CreatedOn = DateTime.UtcNow
+                CreatedOn = DateTime.UtcNow,
+                StockId = createCommentDto.StockId
             };
-            var createdComment = await _commentsRepository.CreateCommentDto(commentModel);
-            return CreatedAtAction(nameof(GetCommentByIdAsync), new { id = createdComment.Id }, createdComment);
+            var createdComment = await _commentsRepository.CreateComment(commentModel);
+
+            return CreatedAtAction(nameof(GetCommentByIdAsync), "Comment", new { id = createdComment.Id }, createdComment);
         }
 
         [HttpDelete]

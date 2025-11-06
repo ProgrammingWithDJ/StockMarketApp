@@ -29,7 +29,7 @@ namespace APIWeb.Repositories
             return comment;
         }
 
-        public async Task<Comment> CreateCommentDto(Comment comment)
+        public async Task<Comment> CreateComment(Comment comment)
         {
             _dBContext.Comment.Add(comment);
             await _dBContext.SaveChangesAsync();

@@ -8,7 +8,7 @@ namespace APIWeb.Interfaces
 
         Task<Comment>? GetCommentByIdAsync(int id);
 
-        Task<Comment> CreateCommentDto(Comment comment);
+        Task<Comment> CreateComment(Comment comment);
 
         Task DeleteCommentAsync(int id);
 
