@@ -1,4 +1,6 @@
-﻿namespace APIWeb.Dtos.Stocks
+﻿using APIWeb.Dtos.Comments;
+
+namespace APIWeb.Dtos.Stocks
 {
     public class StocksDto
     {
@@ -15,5 +17,7 @@
         public string Industry { get; set; } = string.Empty;
 
         public long MarketCap { get; set; }
+
+        public List<CommentDto> Comments { get; set; }
     }
 }

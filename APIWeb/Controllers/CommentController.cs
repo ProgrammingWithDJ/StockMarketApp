@@ -44,7 +44,7 @@ namespace APIWeb.Controllers
             };
             var createdComment = await _commentsRepository.CreateComment(commentModel);
 
-            return CreatedAtAction(nameof(GetCommentByIdAsync), "Comment", new { id = createdComment.Id }, createdComment);
+            return NoContent();
         }
 
         [HttpDelete]

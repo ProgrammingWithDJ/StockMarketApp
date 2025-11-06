@@ -14,12 +14,12 @@ namespace APIWeb.Repositories
         }
         public async Task<List<Stock>> GetAllStocksAsync()
         {
-           return await _context.Stock.ToListAsync();
+           return await _context.Stock.Include(c => c.Comments).ToListAsync();
         }
 
         public async Task<Stock?> GetStockByIdAsync(int id)
         {
-            var stock = await _context.Stock.FindAsync(id);
+            var stock = await _context.Stock.Include(c => c.Comments).FirstOrDefaultAsync(x => x.Id == id);
 
             if(stock == null)
             {
