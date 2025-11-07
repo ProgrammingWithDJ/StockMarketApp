@@ -3,6 +3,7 @@ using APIWeb.Dtos.Stocks;
 
 namespace APIWeb.Mappers
 {
+    
     public static class CommentMappers
     {
         public static CommentDto ToCommentDto(this Comment commentModel)
@@ -17,15 +18,23 @@ namespace APIWeb.Mappers
             };
         }
 
-        public static Comment ToCommentFromCreateDto(this CreateCommentDto createCommentDto)
+        public static Comment ToCommentFromCreateDto(this CreateCommentDto createCommentDto, int stockId)
         {
            return new Comment
            {
                Title = createCommentDto.Title,
                Content = createCommentDto.Content,
-               StockId = createCommentDto.StockId,
-               CreatedOn = DateTime.UtcNow
+               StockId = stockId,
            };
+        }
+
+        public static Comment ToCommentFromUpdate(this UpdateCommentDto updateCommentDto)
+        {
+            return new Comment
+            {
+                Title = updateCommentDto.Title,
+                Content = updateCommentDto.Content
+            };
         }
     }
 }

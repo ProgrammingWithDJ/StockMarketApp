@@ -19,6 +19,11 @@ namespace APIWeb.Repositories
             return await _dBContext.Comment.ToListAsync();
         }
 
+        public async Task<bool> CommentExists(int id)
+        {
+            return await _dBContext.Comment.AnyAsync(c => c.Id == id);
+        }
+
         public async Task<Comment?> GetCommentByIdAsync(int id)
         {
             var comment = await _dBContext.Comment.FindAsync(id);
@@ -56,15 +61,15 @@ namespace APIWeb.Repositories
             }
         }
 
-        public async Task<Comment>? UpdateCommentAsync(int id, CreateCommentDto updateCommentDto)
+        public async Task<Comment>? UpdateCommentAsync(int id, Comment commentModel)
         {
             var existingComment = await _dBContext.Comment.FindAsync(id);
             if (existingComment == null)
             {
                 return null;
             }
-            existingComment.Title = updateCommentDto.Title;
-            existingComment.Content = updateCommentDto.Content;
+            existingComment.Title = commentModel.Title;
+            existingComment.Content = commentModel.Content;
 
             _dBContext.Comment.Update(existingComment);
             await _dBContext.SaveChangesAsync();

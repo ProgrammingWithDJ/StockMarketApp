@@ -12,6 +12,8 @@ namespace APIWeb.Interfaces
 
         Task DeleteCommentAsync(int id);
 
-        Task<Comment>? UpdateCommentAsync(int id, CreateCommentDto updateCommentDto);
+        Task<bool> CommentExists(int id);
+
+        Task<Comment>? UpdateCommentAsync(int id, Comment commentModel);
     }
 }

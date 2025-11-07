@@ -1,6 +1,8 @@
 ﻿using APIWeb.Dtos.Comments;
 using APIWeb.Interfaces;
 using APIWeb.Mappers;
+using APIWeb.Mappers;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
 namespace APIWeb.Controllers
@@ -10,9 +12,11 @@ namespace APIWeb.Controllers
     public class CommentController : ControllerBase
     {
         private readonly ICommentsRepository _commentsRepository;
-        public CommentController(ICommentsRepository commentsRepository)
+        private readonly IStockRepository _stockRepository;
+        public CommentController(ICommentsRepository commentsRepository, IStockRepository stockRepository)
         {
             _commentsRepository = commentsRepository;
+            _stockRepository = stockRepository;
         }
 
         [HttpGet]
@@ -32,16 +36,19 @@ namespace APIWeb.Controllers
             return Ok(comment);
         }
 
-        [HttpPost]
-        public async Task<IActionResult> CreateCommentAsync([FromBody] CreateCommentDto createCommentDto)
+        [HttpPost("{stockId}")]
+        public async Task<IActionResult> CreateCommentAsync([FromRoute] int stockId,[FromBody] CreateCommentDto createCommentDto)
         {
-            var commentModel = new Comment
+            var stock = await _stockRepository.StockExists(stockId);
+
+            if(!stock)
             {
-                Title = createCommentDto.Title,
-                Content = createCommentDto.Content,
-                CreatedOn = DateTime.UtcNow,
-                StockId = createCommentDto.StockId
-            };
+                return BadRequest($"Stock with ID {stockId} not found.");
+            }
+
+            var commentModel = CommentMappers.ToCommentFromCreateDto(createCommentDto, stockId);
+           
+            
             var createdComment = await _commentsRepository.CreateComment(commentModel);
 
             return NoContent();
@@ -57,9 +64,16 @@ namespace APIWeb.Controllers
 
         [HttpPut]
         [Route("{id}")]
-        public async Task<IActionResult> UpdateCommentAsync([FromRoute] int id, [FromBody] CreateCommentDto updateCommentDto)
+        public async Task<IActionResult> UpdateCommentAsync([FromRoute] int id, [FromBody] UpdateCommentDto updateCommentDto)
         {
-            var updatedComment = await _commentsRepository.UpdateCommentAsync(id, updateCommentDto);
+            var comment = await _commentsRepository.CommentExists(id);
+
+            if (!comment)
+            {
+                return BadRequest($"Comment with ID {comment} not found.");
+            }
+
+            var updatedComment = await _commentsRepository.UpdateCommentAsync(id, updateCommentDto.ToCommentFromUpdate());
             if (updatedComment == null)
             {
                 return NotFound();
