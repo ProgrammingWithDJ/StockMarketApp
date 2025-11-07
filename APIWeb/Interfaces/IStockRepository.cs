@@ -1,10 +1,11 @@
 ﻿using APIWeb.Dtos.Stocks;
+using APIWeb.Helpers;
 
 namespace APIWeb.Interfaces
 {
     public interface IStockRepository
     {
-        Task<List<Stock>> GetAllStocksAsync();
+        Task<List<Stock>> GetAllStocksAsync(QueryObject query);
 
         Task<Stock?> GetStockByIdAsync(int id);
 

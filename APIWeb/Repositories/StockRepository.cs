@@ -1,5 +1,6 @@
 ﻿using APIWeb.Data;
 using APIWeb.Dtos.Stocks;
+using APIWeb.Helpers;
 using APIWeb.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
@@ -12,9 +13,21 @@ namespace APIWeb.Repositories
         {
             _context = dBContext;
         }
-        public async Task<List<Stock>> GetAllStocksAsync()
+        public async Task<List<Stock>> GetAllStocksAsync(QueryObject queryObject)
         {
-           return await _context.Stock.Include(c => c.Comments).ToListAsync();
+            var stocks = _context.Stock.Include(c => c.Comments).AsQueryable();
+
+            if(!string.IsNullOrWhiteSpace(queryObject.Symbol))
+            {
+                stocks = stocks.Where(s => s.Symbol.Contains( queryObject.Symbol));
+            }
+
+            if (!string.IsNullOrWhiteSpace(queryObject.CompanyName))
+            {
+                stocks = stocks.Where(s => s.CompanyName.Contains(queryObject.CompanyName));
+            }
+
+            return await stocks.ToListAsync();
         }
 
         public async Task<Stock?> GetStockByIdAsync(int id)

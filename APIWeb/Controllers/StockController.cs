@@ -1,5 +1,6 @@
 ﻿using APIWeb.Data;
 using APIWeb.Dtos.Stocks;
+using APIWeb.Helpers;
 using APIWeb.Interfaces;
 using APIWeb.Mappers;
 using Microsoft.AspNetCore.Mvc;
@@ -20,9 +21,9 @@ namespace APIWeb.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllStocksAsync()
+        public async Task<IActionResult> GetAllStocksAsync([FromQuery] QueryObject query)
         {
-            var stocks = await _stockRepo.GetAllStocksAsync();
+            var stocks = await _stockRepo.GetAllStocksAsync(query);
 
             var selectedSTocks = stocks.Select(s => s.ToStockDto());
             return Ok(selectedSTocks);
