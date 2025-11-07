@@ -13,5 +13,7 @@ namespace APIWeb.Interfaces
         Task DeleteStockAsync(int id);
 
         Task<Stock?> UpdateStockAsync(int id,UpdateStockDto UpdateStockDto);
+
+        Task<bool> StockExists(int id);
     }
 }
