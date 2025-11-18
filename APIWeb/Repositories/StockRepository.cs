@@ -60,9 +60,12 @@ namespace APIWeb.Repositories
                         // unknown key: no ordering change (or optionally apply a safe default)
                         break;
                 }
-            }
 
-                return await stocks.ToListAsync();
+               
+            }
+            var skipNunber = (queryObject.pageNumber - 1) * queryObject.pageSize;
+
+            return await stocks.Skip(skipNunber).Take(queryObject.pageSize).ToListAsync();
         }
 
         public async Task<Stock?> GetStockByIdAsync(int id)
