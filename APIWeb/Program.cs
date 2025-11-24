@@ -4,6 +4,7 @@ using APIWeb.Interfaces;
 using APIWeb.Repositories;
 using APIWeb.Models;
 using Microsoft.AspNetCore.Identity;
+using APIWeb.Service;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,6 +23,8 @@ builder.Services.AddDbContext<ApplicationDBContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
+
+
 
 builder.Services.AddIdentity<AppUser, IdentityRole>(options =>
 {
@@ -58,6 +61,7 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddScoped<IStockRepository, StockRepository>();
 builder.Services.AddScoped<ICommentsRepository, CommentsRepository>();
+builder.Services.AddScoped<ITokenService, TokenService>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -69,6 +73,8 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.
+    UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
